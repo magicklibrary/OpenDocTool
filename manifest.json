@@ -1,0 +1,36 @@
+{
+  "name": "OpenDocTools",
+  "short_name": "DocTools",
+  "description": "Open-source browser-based PDF & TIFF editor. Merge, redact, sign, and export — 100% local.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0d0f14",
+  "theme_color": "#0f1117",
+  "orientation": "any",
+  "lang": "en",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='32' fill='%230f1117'/><path d='M44 36h80l48 48v96H44z' fill='none' stroke='%2300d4aa' stroke-width='10' stroke-linejoin='round'/><path d='M124 36v48h48' fill='none' stroke='%2300d4aa' stroke-width='10'/><line x1='68' y1='118' x2='148' y2='118' stroke='%2300d4aa' stroke-width='8' stroke-linecap='round'/><line x1='68' y1='142' x2='120' y2='142' stroke='%2300d4aa' stroke-width='8' stroke-linecap='round'/></svg>",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='80' fill='%230f1117'/><path d='M100 80h230l130 130v270H100z' fill='none' stroke='%2300d4aa' stroke-width='24' stroke-linejoin='round'/><path d='M330 80v130h130' fill='none' stroke='%2300d4aa' stroke-width='24'/><line x1='160' y1='310' x2='380' y2='310' stroke='%2300d4aa' stroke-width='20' stroke-linecap='round'/><line x1='160' y1='370' x2='300' y2='370' stroke='%2300d4aa' stroke-width='20' stroke-linecap='round'/></svg>",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["productivity", "utilities"],
+  "shortcuts": [
+    {
+      "name": "Upload PDF",
+      "short_name": "Upload",
+      "description": "Open a PDF or TIFF file",
+      "url": "./index.html"
+    }
+  ],
+  "screenshots": [],
+  "prefer_related_applications": false
+}

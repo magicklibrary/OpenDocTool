@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="OpenDocTools — Open-source browser-based PDF & TIFF editor. No uploads, no servers, 100% private." />
+  <meta name="theme-color" content="#0f1117" />
+  <title>OpenDocTools</title>
+
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='16' fill='%230f1117'/><path d='M25 20h35l15 15v45H25z' fill='none' stroke='%2300d4aa' stroke-width='5' stroke-linejoin='round'/><path d='M58 20v17h17' fill='none' stroke='%2300d4aa' stroke-width='5'/><line x1='35' y1='50' x2='65' y2='50' stroke='%2300d4aa' stroke-width='4' stroke-linecap='round'/><line x1='35' y1='62' x2='55' y2='62' stroke='%2300d4aa' stroke-width='4' stroke-linecap='round'/></svg>" />
+
+  <!-- Libraries via CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"></script>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- PWA Install Banner -->
+  <div id="install-banner" class="install-banner hidden">
+    <span>📥 Install OpenDocTools for offline use</span>
+    <button id="install-btn" class="btn btn-accent">Install</button>
+    <button id="dismiss-install" class="btn btn-ghost">✕</button>
+  </div>
+
+  <!-- Top Toolbar -->
+  <header class="toolbar" role="banner">
+    <div class="toolbar-brand">
+      <svg class="brand-icon" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect width="32" height="32" rx="6" fill="#0f1117"/>
+        <path d="M8 6h11l7 7v13H8z" stroke="#00d4aa" stroke-width="1.8" stroke-linejoin="round"/>
+        <path d="M19 6v7h7" stroke="#00d4aa" stroke-width="1.8"/>
+        <line x1="11" y1="17" x2="21" y2="17" stroke="#00d4aa" stroke-width="1.5" stroke-linecap="round"/>
+        <line x1="11" y1="21" x2="17" y2="21" stroke="#00d4aa" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+      <span class="brand-name">OpenDocTools</span>
+      <span class="brand-badge">Open Source</span>
+    </div>
+
+    <nav class="toolbar-actions" role="toolbar" aria-label="Document actions">
+
+      <!-- File Operations -->
+      <div class="toolbar-group">
+        <button class="btn btn-primary" id="upload-btn" title="Upload PDF or TIFF file">
+          <svg viewBox="0 0 20 20"><path d="M10 2L5 7h3v7h4V7h3L10 2z"/><path d="M3 16h14v1H3z" opacity=".5"/></svg>
+          Upload File
+        </button>
+        <input type="file" id="file-input" accept=".pdf,.tiff,.tif" multiple hidden />
+
+        <button class="btn btn-secondary" id="merge-btn" title="Merge multiple PDFs" disabled>
+          <svg viewBox="0 0 20 20"><path d="M4 6h5v8H4zM11 6h5v8h-5z" opacity=".4"/><path d="M9 10h2"/></svg>
+          Merge PDFs
+        </button>
+      </div>
+
+      <div class="toolbar-divider"></div>
+
+      <!-- Page Operations -->
+      <div class="toolbar-group">
+        <button class="btn btn-secondary" id="remove-page-btn" title="Remove current page" disabled>
+          <svg viewBox="0 0 20 20"><path d="M5 5l10 10M15 5L5 15" stroke-linecap="round"/></svg>
+          Remove Page
+        </button>
+        <button class="btn btn-secondary" id="reorder-btn" title="Reorder pages" disabled>
+          <svg viewBox="0 0 20 20"><path d="M5 7h10M5 10h10M5 13h10" stroke-linecap="round"/></svg>
+          Reorder Pages
+        </button>
+        <button class="btn btn-secondary" id="split-btn" title="Split PDF at current page" disabled>
+          <svg viewBox="0 0 20 20"><path d="M10 3v14M6 6l4-3 4 3M6 14l4 3 4-3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Split PDF
+        </button>
+      </div>
+
+      <div class="toolbar-divider"></div>
+
+      <!-- Annotation Tools -->
+      <div class="toolbar-group">
+        <button class="btn btn-secondary tool-toggle" id="redact-btn" title="Draw redaction box" disabled>
+          <svg viewBox="0 0 20 20"><rect x="3" y="7" width="14" height="6" rx="1" fill="currentColor" opacity=".8"/></svg>
+          Redact
+        </button>
+        <button class="btn btn-secondary tool-toggle" id="sign-btn" title="Add signature" disabled>
+          <svg viewBox="0 0 20 20"><path d="M3 15c2-4 4-8 5-8s1 4 2 4 2-6 3-6 1 3 2 3" stroke-linecap="round" fill="none"/></svg>
+          Sign
+        </button>
+      </div>
+
+      <div class="toolbar-divider"></div>
+
+      <!-- Export -->
+      <div class="toolbar-group">
+        <button class="btn btn-accent" id="export-pdf-btn" title="Export as PDF" disabled>
+          <svg viewBox="0 0 20 20"><path d="M10 14V4M6 10l4 4 4-4" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M3 16h14" stroke-linecap="round" opacity=".5"/></svg>
+          Export PDF
+        </button>
+        <button class="btn btn-secondary" id="export-tiff-btn" title="Export as TIFF" disabled>
+          <svg viewBox="0 0 20 20"><path d="M10 14V4M6 10l4 4 4-4" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M3 16h14" stroke-linecap="round" opacity=".5"/></svg>
+          Export TIFF
+        </button>
+      </div>
+    </nav>
+
+    <!-- Zoom Controls -->
+    <div class="zoom-controls">
+      <button class="btn btn-ghost btn-icon" id="zoom-out" title="Zoom out">−</button>
+      <span class="zoom-label" id="zoom-label">100%</span>
+      <button class="btn btn-ghost btn-icon" id="zoom-in" title="Zoom in">+</button>
+      <button class="btn btn-ghost btn-sm" id="zoom-fit" title="Fit to page">Fit</button>
+    </div>
+  </header>
+
+  <!-- Main Layout -->
+  <main class="app-layout" role="main">
+
+    <!-- Left Sidebar: Thumbnails -->
+    <aside class="sidebar" id="sidebar" role="complementary" aria-label="Page thumbnails">
+      <div class="sidebar-header">
+        <span class="sidebar-title">Pages</span>
+        <span class="sidebar-count" id="page-count-label">—</span>
+      </div>
+      <div class="thumbnails" id="thumbnails" role="list" aria-label="Document pages">
+        <div class="empty-sidebar">
+          <svg viewBox="0 0 48 48" fill="none"><path d="M12 8h16l12 12v24H12z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M28 8v12h12" stroke="currentColor" stroke-width="2"/></svg>
+          <p>Upload a file<br/>to get started</p>
+        </div>
+      </div>
+
+      <!-- Merge Queue (shown when merging) -->
+      <div class="merge-queue hidden" id="merge-queue">
+        <div class="merge-queue-header">
+          <span>Merge Queue</span>
+          <span class="merge-count" id="merge-count">0 files</span>
+        </div>
+        <div id="merge-file-list" class="merge-file-list"></div>
+        <div class="merge-queue-actions">
+          <button class="btn btn-accent btn-full" id="do-merge-btn">Merge All</button>
+          <button class="btn btn-ghost btn-full" id="cancel-merge-btn">Cancel</button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Canvas Viewer -->
+    <section class="viewer-area" role="region" aria-label="Document viewer">
+
+      <!-- Drop Zone Overlay -->
+      <div class="drop-zone" id="drop-zone" aria-hidden="true">
+        <div class="drop-zone-content">
+          <svg viewBox="0 0 64 64" fill="none"><path d="M32 8v32M20 28l12-20 12 20" stroke="#00d4aa" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 44v8a2 2 0 002 2h36a2 2 0 002-2v-8" stroke="#00d4aa" stroke-width="3" stroke-linecap="round"/></svg>
+          <h2>Drop PDF or TIFF here</h2>
+          <p>or click <strong>Upload File</strong> in the toolbar</p>
+          <p class="drop-note">All processing happens locally — files never leave your device</p>
+        </div>
+      </div>
+
+      <!-- Canvas Layer -->
+      <div class="canvas-container" id="canvas-container" hidden>
+        <canvas id="pdf-canvas"></canvas>
+        <canvas id="fabric-canvas"></canvas>
+      </div>
+
+      <!-- Page Navigation -->
+      <div class="page-nav" id="page-nav" hidden>
+        <button class="btn btn-ghost btn-icon" id="prev-page" title="Previous page" aria-label="Previous page">‹</button>
+        <span class="page-indicator">
+          <span id="current-page-num">1</span>
+          <span class="page-sep">of</span>
+          <span id="total-page-num">1</span>
+        </span>
+        <button class="btn btn-ghost btn-icon" id="next-page" title="Next page" aria-label="Next page">›</button>
+      </div>
+
+      <!-- Tool Status Bar -->
+      <div class="status-bar" id="status-bar" hidden>
+        <span id="tool-status">Ready</span>
+        <button class="btn btn-ghost btn-sm" id="clear-annotations" hidden>Clear Annotations</button>
+        <button class="btn btn-ghost btn-sm" id="apply-redactions" hidden>Apply Redactions</button>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ===================== MODALS ===================== -->
+
+  <!-- Signature Modal -->
+  <div class="modal-overlay hidden" id="sign-modal" role="dialog" aria-modal="true" aria-labelledby="sign-modal-title">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="sign-modal-title">Add Signature</h2>
+        <button class="btn btn-ghost btn-icon modal-close" data-modal="sign-modal">✕</button>
+      </div>
+
+      <div class="modal-tabs">
+        <button class="tab-btn active" data-tab="draw-tab">Draw</button>
+        <button class="tab-btn" data-tab="type-tab">Type</button>
+      </div>
+
+      <div class="tab-content active" id="draw-tab">
+        <canvas id="sig-canvas" width="480" height="160"></canvas>
+        <div class="modal-row">
+          <label class="modal-label">Color</label>
+          <input type="color" id="sig-color" value="#0a0a0a" />
+          <label class="modal-label" style="margin-left:16px">Width</label>
+          <input type="range" id="sig-width" min="1" max="8" value="2" style="width:80px" />
+          <button class="btn btn-ghost btn-sm" id="clear-sig">Clear</button>
+        </div>
+      </div>
+
+      <div class="tab-content" id="type-tab">
+        <div class="type-sig-preview" id="type-sig-preview">Your Signature</div>
+        <input type="text" class="sig-text-input" id="sig-text" placeholder="Type your name…" maxlength="60" />
+        <div class="sig-font-row">
+          <button class="sig-font-btn active" data-font="'Dancing Script', cursive">Script</button>
+          <button class="sig-font-btn" data-font="'Satisfy', cursive">Classic</button>
+          <button class="sig-font-btn" data-font="'Permanent Marker', cursive">Marker</button>
+          <button class="sig-font-btn" data-font="'Rock Salt', cursive">Rough</button>
+        </div>
+        <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Satisfy&family=Permanent+Marker&family=Rock+Salt&display=swap" rel="stylesheet">
+      </div>
+
+      <div class="modal-footer">
+        <div class="signer-row">
+          <label class="modal-label">Signer Name</label>
+          <input type="text" id="signer-name" class="input-sm" placeholder="e.g. Jane Smith" maxlength="60" />
+        </div>
+        <div class="modal-btn-row">
+          <button class="btn btn-ghost" data-modal="sign-modal">Cancel</button>
+          <button class="btn btn-accent" id="place-sig-btn">Place on Document →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Reorder Modal -->
+  <div class="modal-overlay hidden" id="reorder-modal" role="dialog" aria-modal="true" aria-labelledby="reorder-modal-title">
+    <div class="modal modal-wide">
+      <div class="modal-header">
+        <h2 id="reorder-modal-title">Reorder Pages</h2>
+        <button class="btn btn-ghost btn-icon modal-close" data-modal="reorder-modal">✕</button>
+      </div>
+      <p class="modal-hint">Drag thumbnails to reorder pages.</p>
+      <div class="reorder-grid" id="reorder-grid"></div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" data-modal="reorder-modal">Cancel</button>
+        <button class="btn btn-accent" id="apply-reorder-btn">Apply Order</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Split Modal -->
+  <div class="modal-overlay hidden" id="split-modal" role="dialog" aria-modal="true" aria-labelledby="split-modal-title">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="split-modal-title">Split PDF</h2>
+        <button class="btn btn-ghost btn-icon modal-close" data-modal="split-modal">✕</button>
+      </div>
+      <p class="modal-hint">Split the document into two files at the page boundary you choose.</p>
+      <div class="split-options">
+        <label class="modal-label">Split after page:</label>
+        <input type="number" id="split-page-input" class="input-sm" min="1" value="1" />
+        <span class="split-total" id="split-total-label">of 1</span>
+      </div>
+      <p class="split-preview" id="split-preview">Part 1: pages 1–1 &nbsp;|&nbsp; Part 2: pages 2–1</p>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" data-modal="split-modal">Cancel</button>
+        <button class="btn btn-accent" id="do-split-btn">Split & Download</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notifications -->
+  <div class="toast-container" id="toast-container" aria-live="polite"></div>
+
+  <!-- Loading Overlay -->
+  <div class="loading-overlay hidden" id="loading-overlay">
+    <div class="loading-content">
+      <div class="spinner"></div>
+      <span id="loading-msg">Processing…</span>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="pdf-utils.js"></script>
+  <script src="tiff-utils.js"></script>
+  <script src="signature.js"></script>
+  <script src="app.js"></script>
+
+  <script>
+    // Service Worker Registration
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('service-worker.js')
+          .catch(err => console.warn('SW registration failed:', err));
+      });
+    }
+  </script>
+</body>
+</html>
