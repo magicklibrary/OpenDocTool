@@ -10,7 +10,8 @@
 
 ## Overview
 
-**OpenDocTools** is a fully client-side document editor that runs entirely in the browser. Upload PDF or TIFF files, edit them, annotate, sign, and export — without any file ever leaving your device.
+**OpenDocTools** is a fully client-side document editor that runs entirely in the browser. The link to access the file is available here: https://magicklibrary.github.io/OpenDocTool/
+Upload PDF or TIFF files, edit them, annotate, sign, and export — without any file ever leaving your device.
 
 Built with vanilla JavaScript and battle-tested open-source libraries, it works offline as an installable Progressive Web App (PWA).
 
